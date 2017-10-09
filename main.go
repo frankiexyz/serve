@@ -12,9 +12,12 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
+	"github.com/goji/httpauth"
 )
 
 var path string
+var user string
+var pass string
 var listenAddress string
 var spin *spinner.Spinner
 
@@ -30,6 +33,8 @@ func init() {
 	// input flags
 	flag.StringVar(&listenAddress, "l", ":8000", "The address for the server to listen on. Examples: :80, 127.0.0.1:8000")
 	flag.StringVar(&path, "p", wd, "The path for the server to serve.")
+	flag.StringVar(&user, "user", "", "Simple Auth username.")
+	flag.StringVar(&pass, "pass", "", "Simple Auth password.")
 	flag.Parse()
 }
 
@@ -61,7 +66,11 @@ func main() {
 	spin.Start()
 
 	// initialze a file server handler
-	http.Handle("/", http.FileServer(http.Dir(path)))
+	if len(user) > 0 && len(pass) > 0 {
+		http.Handle("/", httpauth.SimpleBasicAuth(user, pass)((http.FileServer(http.Dir(path)))))
+	} else {
+		http.Handle("/", http.FileServer(http.Dir(path)))
+	}
 	err := http.ListenAndServe(listenAddress, nil)
 	spin.Stop()
 	if err != nil {
