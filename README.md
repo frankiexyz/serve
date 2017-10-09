@@ -32,4 +32,8 @@ Usage of serve:
         The address for the server to listen on. Examples: :80, 127.0.0.1:8000 (default ":8000")
   -p string
         The path for the server to serve. (default "/Current/directory")
+  -pass string
+        Simple Auth password.
+  -user string
+        Simple Auth username.
 ```
